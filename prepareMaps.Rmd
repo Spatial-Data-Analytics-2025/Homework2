@@ -1,0 +1,114 @@
+---
+title: "Homework 2"
+output:
+  html_document:
+    df_print: paged
+---
+
+```{r}
+rm(list = ls())
+
+ChicagoLink="https://github.com/Spatial-Data-Analytics-2025/Homework2/raw/refs/heads/main/chicago_spatial_data.gpkg"
+library(sf)
+st_layers(ChicagoLink)
+```
+```{r}
+gpklink='chicago_spatial_data.gpkg'
+```
+
+```{r}
+library(sf)
+
+fuel_stations = read_sf(gpklink, layer = "fuel_stations")
+schools = read_sf(gpklink, layer = "schools")
+good_buffers = read_sf(gpklink, layer = "good_buffers")
+good_centers = read_sf(gpklink, layer = "relocate_points")
+relocate_points = read_sf(gpklink, layer = "good_centers")
+good_routes = read_sf(gpklink, layer = "good_routes")
+
+```
+
+```{r}
+library(ggplot2)
+
+# Good routes
+
+Routes_Map = ggplot() +
+theme_bw() +
+geom_sf(data = good_routes, color = 'Blue') +
+ggtitle("Good Routes for Gas Stations")
+Routes_Map
+saveRDS(Routes_Map, file='Routes_Map.rds')
+
+```
+```{r}
+library(ggplot2)
+library(sf)
+library(dplyr)
+
+# Combined map with routes shown but not in the legend
+map_relocate_final <- ggplot() +
+  # Routes (not in legend)
+  geom_sf(data = good_routes, color = "blue", size = 1, show.legend = FALSE) +
+  
+  # Points with legend
+  geom_sf(data = good_centers, aes(shape = "Stations to Relocate"), color = "red", size = 2) +
+  geom_sf(data = fuel_stations, aes(shape = "Fuel Station"), color = "black", size = 1) +
+  geom_sf(data = schools, aes(shape = "School"), color = "green", size = 0.8) +
+  geom_sf(data = relocate_points, aes(shape = "Relocate Point"), color = "magenta", size = 3) +
+  
+  # Legend setup
+  scale_shape_manual(
+    name = "Legend",
+    values = c(
+      "Fuel Station" = 16,
+      "School" = 16,
+      "Stations to Relocate" = 5,
+      "Relocate Point" = 4
+    )
+  ) +
+  
+  # Theme and title
+  theme_bw() +
+  ggtitle("Map of Stations to Relocate") +
+  theme(legend.position = "right")
+
+# Show the map
+map_relocate_final
+
+# Save for dashboard
+saveRDS(map_relocate_final, file = "map_of_stations_to_relocate_final.rds")
+
+```
+
+```{r}
+
+library(mapview)
+library(sf)
+library(dplyr)
+
+gpklink <- "chicago_spatial_data.gpkg"
+relocate_points <- read_sf(gpklink, layer = "relocate_points")
+schools <- read_sf(gpklink, layer = "schools")
+relocate_points <- st_transform(relocate_points, 4326)
+schools <- st_transform(schools, 4326)
+
+buffer_75m <- st_buffer(relocate_points, dist = 75)
+
+nearby_schools <- st_intersection(schools, buffer_75m)
+
+# Create the map and assign to an object
+Relocation_Map <- mapview(buffer_75m, color = "red", alpha = 0.2, legend = FALSE) +
+  mapview(nearby_schools, color = "yellow", legend = FALSE) +
+  mapview(relocate_points, color = "red", cex = 2, layer.name = "Relocate Points")
+
+# View the map
+Relocation_Map
+
+# Save the map as an RDS
+saveRDS(Relocation_Map, file = "Relocation_Map.rds")
+
+
+
+```
+
