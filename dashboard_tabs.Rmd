@@ -6,20 +6,9 @@ output:
       - { icon: "fa-github", href: "https://github.com/Spatial-Data-Analytics-2025/Homework2", align: right }
 ---
 
-
 ```{r setup, include=FALSE}
-# Ensure knitr uses a stable temp directory
 library(flexdashboard)
-library(knitr)
 
-# Force knitr to copy dependencies locally
-knitr::opts_knit$set(root.dir = "C:/Users/sread/OneDrive/Documents/DACSS690D/Homework2")
-setwd("C:/Users/sread/OneDrive/Documents/DACSS690D/Homework2")
-
-# Optional: clean and recreate a temp directory just for knitting
-local_temp <- file.path(getwd(), "knit_temp")
-if (!dir.exists(local_temp)) dir.create(local_temp)
-Sys.setenv(TMPDIR = local_temp)
 ```
 
 ## Sidebar {.sidebar}
