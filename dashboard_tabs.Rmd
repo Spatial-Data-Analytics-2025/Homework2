@@ -1,53 +1,63 @@
 ---
-title: "My Storyboard at DACSS - tabs"
-output: 
-  flexdashboard::flex_dashboard
+title: "Homework 2 - tabs"
+output:
+  flexdashboard::flex_dashboard:
+    navbar:
+      - { icon: "fa-github", href: "https://github.com/Spatial-Data-Analytics-2025/Homework2", align: right }
 ---
 
+
 ```{r setup, include=FALSE}
-library(flexdashboard) # always
-```
+# Ensure knitr uses a stable temp directory
+library(flexdashboard)
+library(knitr)
 
-<!-- links -->
-```{r}
-map1link=
-viz1=url(map1link)
+# Force knitr to copy dependencies locally
+knitr::opts_knit$set(root.dir = "C:/Users/sread/OneDrive/Documents/DACSS690D/Homework2")
+setwd("C:/Users/sread/OneDrive/Documents/DACSS690D/Homework2")
 
-map2link=
-viz2=url(map2link)
+# Optional: clean and recreate a temp directory just for knitting
+local_temp <- file.path(getwd(), "knit_temp")
+if (!dir.exists(local_temp)) dir.create(local_temp)
+Sys.setenv(TMPDIR = local_temp)
 ```
 
 ## Sidebar {.sidebar}
 
 
-I can give some textual explanation here!
+
+link to Repo - https://github.com/Spatial-Data-Analytics-2025/Homework2.git
+
+The three maps in this dashboard all focus on Chicago. If a gas station was within 75
+meters of a school it was selected for relocation. 75 meters was chosen because it was the smallest distance where there was at least one example of a gas station being to close to two schools. When going in increments of 25 meters.
+
+The first map provides a view of streets/locations where gas stations could be relocated to within Chicago.
+
+The second map shows all instances where a gas station intercepts the 75m no gas station buffer zone that was coded around all schools in Chicago
+
+The third map combines all relevant layers and illustrates the gas stations that need to be relocated along with possible relocation points.
+
+
 ## Column {.tabset .tabset-fade}
 
 
-### GIVE ME A TITLE 1
+### Available Locations for Gas Stations
 
 ```{r}
-readRDS(viz1)
+readRDS("Routes_Map.rds")
 ```
 
 
-### GIVE ME A TITLE 2
+### Intersection Map
 
 ```{r}
-readRDS(viz2)
+readRDS("Relocation_Map.rds")
 ```
 
-### GIVE ME A TITLE 3
+### Map of Stations to Relocate
 
 ```{r}
-readRDS(viz1)
-```
-
-
-### GIVE ME A TITLE 4
-
-```{r}
-readRDS(viz2)
+readRDS("map_of_stations_to_relocate.rds")
 ```
 
 
