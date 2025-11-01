@@ -80,33 +80,41 @@ map_relocate_final
 saveRDS(map_relocate_final, file = "map_of_stations_to_relocate_final.rds")
 
 ```
+```{r}
+install.packages("ggmap")
+
+```
 
 ```{r}
 
-library(mapview)
+library(ggplot2)
 library(sf)
+library(ggspatial) # for annotation_map_tile
 library(dplyr)
 
 gpklink <- "chicago_spatial_data.gpkg"
-relocate_points <- read_sf(gpklink, layer = "relocate_points")
-schools <- read_sf(gpklink, layer = "schools")
-relocate_points <- st_transform(relocate_points, 4326)
-schools <- st_transform(schools, 4326)
 
-buffer_75m <- st_buffer(relocate_points, dist = 75)
+relocate_points <- read_sf(gpklink, layer = "relocate_points") |> st_transform(4326)
+schools <- read_sf(gpklink, layer = "schools") |> st_transform(4326)
 
+buffer_75m <- st_buffer(relocate_points, 75)
 nearby_schools <- st_intersection(schools, buffer_75m)
 
-# Create the map and assign to an object
-Relocation_Map <- mapview(buffer_75m, color = "red", alpha = 0.2, legend = FALSE) +
-  mapview(nearby_schools, color = "yellow", legend = FALSE) +
-  mapview(relocate_points, color = "red", cex = 2, layer.name = "Relocate Points")
 
-# View the map
+Relocation_Map <- ggplot() +
+  annotation_map_tile(type = "osm", zoom = 13) +   # OpenStreetMap tiles
+  geom_sf(data = buffer_75m, fill = "red", alpha = 0.2, color = NA) +
+  geom_sf(data = nearby_schools, color = "yellow", size = 3, shape = 17) +
+  geom_sf(data = relocate_points, color = "red", size = 2, shape = 5) +
+  ggtitle("Relocation Map") +
+  theme_minimal()
+
+# Display
 Relocation_Map
 
-# Save the map as an RDS
-saveRDS(Relocation_Map, file = "Relocation_Map.rds")
+# Save for flexdashboard
+saveRDS(Relocation_Map, "Relocation_Map.rds")
+
 
 
 
