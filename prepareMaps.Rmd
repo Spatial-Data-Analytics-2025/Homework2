@@ -22,16 +22,15 @@ library(sf)
 fuel_stations = read_sf(gpklink, layer = "fuel_stations")
 schools = read_sf(gpklink, layer = "schools")
 good_buffers = read_sf(gpklink, layer = "good_buffers")
-good_centers = read_sf(gpklink, layer = "relocate_points")
-relocate_points = read_sf(gpklink, layer = "good_centers")
 good_routes = read_sf(gpklink, layer = "good_routes")
+good_centers <- read_sf(gpklink, layer = "good_centers")
+relocate_points <- read_sf(gpklink, layer = "relocate_points")
+
 
 ```
 
 ```{r}
 library(ggplot2)
-
-# Good routes
 
 Routes_Map = ggplot() +
 theme_bw() +
@@ -46,16 +45,17 @@ library(ggplot2)
 library(sf)
 library(dplyr)
 
-# Combined map with routes shown but not in the legend
+
+good_centers <- st_transform(good_centers, 4326)
+
+
+
 map_relocate_final <- ggplot() +
-  # Routes (not in legend)
-  geom_sf(data = good_routes, color = "blue", size = 1, show.legend = FALSE) +
-  
-  # Points with legend
-  geom_sf(data = good_centers, aes(shape = "Stations to Relocate"), color = "red", size = 2) +
+  geom_sf(data = good_routes, color = "blue", size = 0.3, show.legend = FALSE) +
+  geom_sf(data = good_centers, aes(shape = "Potential Fuel Stations"), color = "red", size = 3) +
   geom_sf(data = fuel_stations, aes(shape = "Fuel Station"), color = "black", size = 1) +
   geom_sf(data = schools, aes(shape = "School"), color = "green", size = 0.8) +
-  geom_sf(data = relocate_points, aes(shape = "Relocate Point"), color = "magenta", size = 3) +
+  geom_sf(data = relocate_points, aes(shape = "Stations to Relocate"), color = "magenta", size = 3) +
   
   # Legend setup
   scale_shape_manual(
@@ -63,27 +63,23 @@ map_relocate_final <- ggplot() +
     values = c(
       "Fuel Station" = 16,
       "School" = 16,
-      "Stations to Relocate" = 5,
-      "Relocate Point" = 4
+      "Potential Fuel Stations" = 5,
+      "Stations to Relocate" = 4
     )
   ) +
-  
-  # Theme and title
   theme_bw() +
   ggtitle("Map of Stations to Relocate") +
   theme(legend.position = "right")
 
-# Show the map
 map_relocate_final
 
-# Save for dashboard
 saveRDS(map_relocate_final, file = "map_of_stations_to_relocate_final.rds")
 
-```
-```{r}
-install.packages("ggmap")
+
 
 ```
+
+
 
 ```{r}
 
@@ -104,8 +100,8 @@ nearby_schools <- st_intersection(schools, buffer_75m)
 Relocation_Map <- ggplot() +
   annotation_map_tile(type = "osm", zoom = 13) +   # OpenStreetMap tiles
   geom_sf(data = buffer_75m, fill = "red", alpha = 0.2, color = NA) +
-  geom_sf(data = nearby_schools, color = "yellow", size = 3, shape = 17) +
-  geom_sf(data = relocate_points, color = "red", size = 2, shape = 5) +
+  geom_sf(data = nearby_schools, color = "yellow", size = 2, shape = 17) +
+  geom_sf(data = relocate_points, color = "red", size = 1, shape = 5) +
   ggtitle("Relocation Map") +
   theme_minimal()
 
